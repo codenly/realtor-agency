@@ -28,10 +28,10 @@ interface OwnerDao {
 
 @Dao
 interface TypeDao {
-    @Query("SELECT * FROM owners ORDER BY fullName ASC")
+    @Query("SELECT * FROM types ORDER BY name ASC")
     fun getAllTypes(): Flow<List<TypeEntity>>
 
-    @Query("SELECT * FROM owners WHERE id = :id")
+    @Query("SELECT * FROM types WHERE id = :id")
     suspend fun getTypeById(id: Long): TypeEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -46,10 +46,10 @@ interface TypeDao {
 
 @Dao
 interface ClientDao {
-    @Query("SELECT * FROM owners ORDER BY fullName ASC")
+    @Query("SELECT * FROM clients ORDER BY fullName ASC")
     fun getAllClients(): Flow<List<ClientEntity>>
 
-    @Query("SELECT * FROM owners WHERE id = :id")
+    @Query("SELECT * FROM clients WHERE id = :id")
     suspend fun getClientById(id: Long): ClientEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -64,10 +64,10 @@ interface ClientDao {
 
 @Dao
 interface RealtorDao {
-    @Query("SELECT * FROM owners ORDER BY fullName ASC")
+    @Query("SELECT * FROM realtors ORDER BY fullName ASC")
     fun getAllRealtors(): Flow<List<RealtorEntity>>
 
-    @Query("SELECT * FROM owners WHERE id = :id")
+    @Query("SELECT * FROM realtors WHERE id = :id")
     suspend fun getRealtorById(id: Long): RealtorEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -82,10 +82,10 @@ interface RealtorDao {
 
 @Dao
 interface PropertyDao {
-    @Query("SELECT * FROM owners ORDER BY fullName ASC")
+    @Query("SELECT * FROM properties ORDER BY address ASC")
     fun getAllProperties(): Flow<List<PropertyEntity>>
 
-    @Query("SELECT * FROM owners WHERE id = :id")
+    @Query("SELECT * FROM properties WHERE id = :id")
     suspend fun getPropertyById(id: Long): PropertyEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -100,10 +100,10 @@ interface PropertyDao {
 
 @Dao
 interface ViewDao {
-    @Query("SELECT * FROM owners ORDER BY fullName ASC")
+    @Query("SELECT * FROM views ORDER BY date ASC")
     fun getAllViews(): Flow<List<ViewEntity>>
 
-    @Query("SELECT * FROM owners WHERE id = :id")
+    @Query("SELECT * FROM views WHERE id = :id")
     suspend fun getViewById(id: Long): ViewEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -118,10 +118,10 @@ interface ViewDao {
 
 @Dao
 interface DealDao {
-    @Query("SELECT * FROM owners ORDER BY fullName ASC")
+    @Query("SELECT * FROM deals ORDER BY date ASC")
     fun getAllDeals(): Flow<List<DealEntity>>
 
-    @Query("SELECT * FROM owners WHERE id = :id")
+    @Query("SELECT * FROM deals WHERE id = :id")
     suspend fun getDealById(id: Long): DealEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
