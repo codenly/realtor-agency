@@ -41,7 +41,7 @@ data class RealtorEntity(
     val phoneNumber: String
 )
 
-@Entity(tableName = "objects",
+@Entity(tableName = "properties",
     foreignKeys = [
         ForeignKey(
             entity = OwnerEntity::class,
@@ -61,7 +61,7 @@ data class RealtorEntity(
         Index("typeId")
     ]
 )
-data class ObjectEntity(
+data class PropertyEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val ownerId: Long,
@@ -82,9 +82,9 @@ data class ObjectEntity(
 @Entity(tableName = "views",
     foreignKeys = [
         ForeignKey(
-            entity = ObjectEntity::class,
+            entity = PropertyEntity::class,
             parentColumns = ["id"],
-            childColumns = ["objectId"],
+            childColumns = ["propertyId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
@@ -101,7 +101,7 @@ data class ObjectEntity(
         ),
     ],
     indices = [
-        Index("objectId"),
+        Index("propertyId"),
         Index("clientId"),
         Index("realtorId")
     ]
@@ -109,7 +109,7 @@ data class ObjectEntity(
 data class ViewEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val objectId: Long,
+    val propertyId: Long,
     val clientId: Long?,
     val realtorId: Long?,
     val date: Long,
@@ -119,9 +119,9 @@ data class ViewEntity(
 @Entity(tableName = "deals",
     foreignKeys = [
         ForeignKey(
-            entity = ObjectEntity::class,
+            entity = PropertyEntity::class,
             parentColumns = ["id"],
-            childColumns = ["objectId"],
+            childColumns = ["propertyId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
@@ -138,7 +138,7 @@ data class ViewEntity(
         ),
     ],
     indices = [
-        Index("objectId"),
+        Index("propertyId"),
         Index("clientId"),
         Index("realtorId")
     ]
@@ -146,7 +146,7 @@ data class ViewEntity(
 data class DealEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val objectId: Long,
+    val propertyId: Long,
     val clientId: Long?,
     val realtorId: Long?,
     val date: Long,
