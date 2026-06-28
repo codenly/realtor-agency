@@ -2,6 +2,7 @@ package com.codenly.practice.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.codenly.practice.data.OwnerRepository
 import com.codenly.practice.data.local.OwnerEntity
@@ -25,12 +26,23 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class OwnerListUiState(
-    val owner: List<OwnerEntity> = emptyList(),
+    val owners: List<OwnerEntity> = emptyList(),
     val isLoading: Boolean = true,
     val errorMessage: String? = null
 )
 
-class OwnerViewModel(application: Application) : AndroidViewModel(application) {
+data class OwnerEditUiState(
+    val id: Long? = null,
+    val fullName: String = "",
+    val phoneNumber: String = "",
+    val email: String = "",
+    val isNew: Boolean = true,
+    val isSaving: Boolean = false,
+    val saveSuccess: Boolean = false,
+    val errorMessage: String? = null
+)
+
+class OwnerListViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = AppDatabase.getDatabase(application)
     private val repository = OwnerRepository(db.getOwnerDao())
@@ -40,10 +52,10 @@ class OwnerViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
-            repository.allOwners.collect { owner ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        owner = owner,
+            repository.allOwners.collect { owners ->
+                _uiState.update {
+                    it.copy(
+                        owners = owners,
                         isLoading = false,
                         errorMessage = null
                     )
@@ -52,20 +64,88 @@ class OwnerViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun addTestOwner() {
+    fun deleteOwner(owner: OwnerEntity) {
         viewModelScope.launch {
             try {
-                val newOwner = OwnerEntity(
-                    fullName = "Сизов Дмитрий Петрович",
-                    phoneNumber = "+79990009988",
-                    email = "sizZOVv@mail.ru"
-                )
-                repository.addOwner(newOwner)
+                repository.deleteOwner(owner)
             } catch (e: Exception){
-                _uiState.update { it.copy(errorMessage = "Ошибка при добавлении ${e.message}") }
+                _uiState.update { it.copy(errorMessage = "Ошибка удаления ${e.message}") }
             }
         }
     }
 
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
+}
 
+class OwnerEditViewModel(
+    application: Application,
+    savedStateHandle: SavedStateHandle
+) : AndroidViewModel(application) {
+
+    private val db = AppDatabase.getDatabase(application)
+    private val repository = OwnerRepository(db.getOwnerDao())
+
+    private val ownerId: Long? = savedStateHandle.get<String>("ownerId")?.toLongOrNull()
+
+    private val _uiState = MutableStateFlow(OwnerEditUiState())
+    val uiState: StateFlow<OwnerEditUiState> = _uiState.asStateFlow()
+
+    init {
+        if (ownerId != null && ownerId != -1L){
+            viewModelScope.launch {
+                val owner = repository.getOwnerById(ownerId)
+                if (owner != null) {
+                    _uiState.update {
+                        it.copy(
+                            fullName = owner.fullName,
+                            phoneNumber = owner.phoneNumber,
+                            email = owner.email,
+                            isNew = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun onFullNameChange(fullName: String) {
+        _uiState.update { it.copy(fullName = fullName) }
+    }
+
+    fun onPhoneNumberChange(phoneNumber: String) {
+        _uiState.update { it.copy(phoneNumber = phoneNumber) }
+    }
+
+    fun onEmailChange(email: String) {
+        _uiState.update { it.copy(email = email) }
+    }
+
+    fun save() {
+        if (_uiState.value.fullName.isBlank() || _uiState.value.phoneNumber.isBlank()
+            || _uiState.value.email.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Поле не может быть пустым") }
+            return
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true) }
+            try {
+                val owner = OwnerEntity(
+                    id = if (ownerId != null && ownerId != -1L) ownerId else 0,
+                    fullName = _uiState.value.fullName,
+                    phoneNumber = _uiState.value.phoneNumber,
+                    email = _uiState.value.email
+                )
+                if (_uiState.value.isNew) {
+                    repository.addOwner(owner)
+                } else {
+                    repository.updateOwner(owner)
+                }
+                _uiState.update { it.copy(isSaving = false, saveSuccess = true) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isSaving = false, errorMessage = "Ошибка сохранения ${e.message}") }
+            }
+        }
+    }
 }
