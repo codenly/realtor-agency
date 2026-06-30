@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +13,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,12 +28,12 @@ import com.codenly.practice.viewmodel.OwnerListViewModel
 import com.codenly.practice.data.local.TypeEntity
 import com.codenly.practice.viewmodel.TypeEditViewModel
 import com.codenly.practice.viewmodel.TypeListViewModel
-//import com.codenly.practice.data.local.ClientEntity
-//import com.codenly.practice.viewmodel.ClientEditViewModel
-//import com.codenly.practice.viewmodel.ClientListViewModel
-//import com.codenly.practice.data.local.RealtorEntity
-//import com.codenly.practice.viewmodel.RealtorEditViewModel
-//import com.codenly.practice.viewmodel.RealtorListViewModel
+import com.codenly.practice.data.local.ClientEntity
+import com.codenly.practice.viewmodel.ClientEditViewModel
+import com.codenly.practice.viewmodel.ClientListViewModel
+import com.codenly.practice.data.local.RealtorEntity
+import com.codenly.practice.viewmodel.RealtorEditViewModel
+import com.codenly.practice.viewmodel.RealtorListViewModel
 //import com.codenly.practice.data.local.PropertyEntity
 //import com.codenly.practice.viewmodel.PropertyEditViewModel
 //import com.codenly.practice.viewmodel.PropertyListViewModel
@@ -42,8 +49,8 @@ import com.codenly.practice.viewmodel.TypeListViewModel
 fun HomeScreen(
     onNavigateToOwners: () -> Unit,
     onNavigateToTypes: () -> Unit,
-//    onNavigateToClients: () -> Unit,
-//    onNavigateToRealtors: () -> Unit,
+    onNavigateToClients: () -> Unit,
+    onNavigateToRealtors: () -> Unit,
 //    onNavigateToProperties: () -> Unit,
 //    onNavigateToViews: () -> Unit,
 //    onNavigateToDeals: () -> Unit,
@@ -67,12 +74,12 @@ fun HomeScreen(
             Button(onNavigateToTypes, modifier = Modifier.fillMaxWidth(0.8f)) {
                 Text("Типы недвижимости")
             }
-//            Button(onNavigateToClients, modifier = Modifier.fillMaxWidth(0.8f)) {
-//                Text("Клиенты")
-//            }
-//            Button(onNavigateToRealtors, modifier = Modifier.fillMaxWidth(0.8f)) {
-//                Text("Риелторы")
-//            }
+            Button(onNavigateToClients, modifier = Modifier.fillMaxWidth(0.8f)) {
+                Text("Клиенты")
+            }
+            Button(onNavigateToRealtors, modifier = Modifier.fillMaxWidth(0.8f)) {
+                Text("Риелторы")
+            }
 //            Button(onNavigateToProperties, modifier = Modifier.fillMaxWidth(0.8f)) {
 //                Text("Объекты недвижимости")
 //            }
@@ -179,6 +186,7 @@ fun OwnerEditScreen(
     ownerEditViewModel: OwnerEditViewModel = viewModel()
 ) {
     val uiState by ownerEditViewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
@@ -200,19 +208,42 @@ fun OwnerEditScreen(
                 value = uiState.fullName,
                 onValueChange = ownerEditViewModel::onFullNameChange,
                 label = { Text("ФИО") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
             )
             OutlinedTextField(
                 value = uiState.phoneNumber,
                 onValueChange = ownerEditViewModel::onPhoneNumberChange,
                 label = { Text("Номер телефона") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
             )
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = ownerEditViewModel::onEmailChange,
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
             )
             if (uiState.errorMessage != null) {
                 Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
@@ -320,6 +351,7 @@ fun TypeEditScreen(
     typeEditViewModel: TypeEditViewModel = viewModel()
 ) {
     val uiState by typeEditViewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
@@ -341,7 +373,14 @@ fun TypeEditScreen(
                 value = uiState.name,
                 onValueChange = typeEditViewModel::onNameChange,
                 label = { Text("Название") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
             )
             if (uiState.errorMessage != null) {
                 Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
@@ -358,306 +397,372 @@ fun TypeEditScreen(
     }
 }
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun ClientListScreen(
-//    onNavigateToEdit: (Long?) -> Unit,
-//    clientViewModel: ClientListViewModel = viewModel()
-//) {
-//    val uiState by clientViewModel.uiState.collectAsStateWithLifecycle()
-//    val snackbarHostState = remember { SnackbarHostState() }
-//
-//    LaunchedEffect(uiState.errorMessage) {
-//        uiState.errorMessage?.let {
-//            snackbarHostState.showSnackbar(it)
-//            clientViewModel.clearError()
-//        }
-//    }
-//
-//    Scaffold(
-//        topBar = { TopAppBar(title = { Text("Клиенты") }) },
-//        floatingActionButton = {
-//            FloatingActionButton(onClick = { onNavigateToEdit(null) }) {
-//                Text("+")
-//            }
-//        },
-//        snackbarHost = { SnackbarHost(snackbarHostState) }
-//    ) { paddingValues ->
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//        ) {
-//            when {
-//                uiState.isLoading -> {
-//                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//                }
-//                uiState.clients.isEmpty() -> {
-//                    Text(
-//                        text = "Нет ни одного клиента",
-//                        modifier = Modifier.align(Alignment.Center)
-//                    )
-//                }
-//                else -> {
-//                    LazyColumn(
-//                        contentPadding = PaddingValues(16.dp),
-//                        verticalArrangement = Arrangement.spacedBy(8.dp)
-//                    ) {
-//                        items(uiState.clients, key = { it.id }) { client ->
-//                            ClientItem(
-//                                client = client,
-//                                onEdit = { onNavigateToEdit(client.id) },
-//                                onDelete = { clientViewModel.deleteClient(client) }
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun ClientItem(
-//    client: ClientEntity,
-//    onEdit: () ->Unit,
-//    onDelete: () -> Unit
-//) {
-//    Row(
-//        modifier = Modifier.fillMaxSize()
-//            .padding(4.dp)
-//    ) {
-//        Card(modifier = Modifier.fillMaxWidth()) {
-//            Column(modifier = Modifier.padding(16.dp)) {
-//                Text(text = client.fullName, style = MaterialTheme.typography.bodyMedium)
-//                Text(text = client.phoneNumber,style = MaterialTheme.typography.bodyMedium)
-//                Text(text = client.email,style = MaterialTheme.typography.bodyMedium)
-//                Text(text = client.preference,style = MaterialTheme.typography.bodyMedium)
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.End
-//                ) {
-//                    TextButton(onClick = onEdit) { Text("Изменить") }
-//                    TextButton(onClick = onDelete) { Text("Удалить") }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun ClientEditScreen(
-//    navController: NavController,
-//    clientEditViewModel: ClientEditViewModel = viewModel()
-//) {
-//    val uiState by clientEditViewModel.uiState.collectAsStateWithLifecycle()
-//
-//    LaunchedEffect(uiState.saveSuccess) {
-//        if (uiState.saveSuccess) {
-//            navController.popBackStack()
-//        }
-//    }
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(title = { Text(if (uiState.isNew) "Новый клиент" else "Редактирование") })
-//        }
-//    ) { paddingValues ->
-//        Column(modifier = Modifier
-//            .fillMaxSize()
-//            .padding(paddingValues)
-//            .padding(16.dp),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)) {
-//            OutlinedTextField(
-//                value = uiState.fullName,
-//                onValueChange = clientEditViewModel::onFullNameChange,
-//                label = { Text("ФИО") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            OutlinedTextField(
-//                value = uiState.phoneNumber,
-//                onValueChange = clientEditViewModel::onPhoneNumberChange,
-//                label = { Text("Номер телефона") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            OutlinedTextField(
-//                value = uiState.email,
-//                onValueChange = clientEditViewModel::onEmailChange,
-//                label = { Text("Email") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            OutlinedTextField(
-//                value = uiState.preference,
-//                onValueChange = clientEditViewModel::onPreferenceChange,
-//                label = { Text("Предпочтения") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            if (uiState.errorMessage != null) {
-//                Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
-//            }
-//            Button(
-//                onClick = clientEditViewModel::save,
-//                enabled = !uiState.isSaving,
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                if (uiState.isSaving) CircularProgressIndicator(modifier = Modifier.size(20.dp))
-//                else Text("Сохранить")
-//            }
-//        }
-//    }
-//}
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun RealtorListScreen(
-//    onNavigateToEdit: (Long?) -> Unit,
-//    realtorViewModel: RealtorListViewModel = viewModel()
-//) {
-//    val uiState by realtorViewModel.uiState.collectAsStateWithLifecycle()
-//    val snackbarHostState = remember { SnackbarHostState() }
-//
-//    LaunchedEffect(uiState.errorMessage) {
-//        uiState.errorMessage?.let {
-//            snackbarHostState.showSnackbar(it)
-//            realtorViewModel.clearError()
-//        }
-//    }
-//
-//    Scaffold(
-//        topBar = { TopAppBar(title = { Text("Риелторы") }) },
-//        floatingActionButton = {
-//            FloatingActionButton(onClick = { onNavigateToEdit(null) }) {
-//                Text("+")
-//            }
-//        },
-//        snackbarHost = { SnackbarHost(snackbarHostState) }
-//    ) { paddingValues ->
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//        ) {
-//            when {
-//                uiState.isLoading -> {
-//                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//                }
-//                uiState.realtors.isEmpty() -> {
-//                    Text(
-//                        text = "Нет ни одного риелтора",
-//                        modifier = Modifier.align(Alignment.Center)
-//                    )
-//                }
-//                else -> {
-//                    LazyColumn(
-//                        contentPadding = PaddingValues(16.dp),
-//                        verticalArrangement = Arrangement.spacedBy(8.dp)
-//                    ) {
-//                        items(uiState.realtors, key = { it.id }) { realtor ->
-//                            RealtorItem(
-//                                realtor = realtor,
-//                                onEdit = { onNavigateToEdit(realtor.id) },
-//                                onDelete = { realtorViewModel.deleteRealtor(realtor) }
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun RealtorItem(
-//    realtor: RealtorEntity,
-//    onEdit: () ->Unit,
-//    onDelete: () -> Unit
-//) {
-//    Row(
-//        modifier = Modifier.fillMaxSize()
-//            .padding(4.dp)
-//    ) {
-//        Card(modifier = Modifier.fillMaxWidth()) {
-//            Column(modifier = Modifier.padding(16.dp)) {
-//                Text(text = realtor.fullName, style = MaterialTheme.typography.bodyMedium)
-//                Text(text = realtor.login,style = MaterialTheme.typography.bodyMedium)
-//                Text(text = realtor.password,style = MaterialTheme.typography.bodyMedium)
-//                Text(text = realtor.phoneNumber,style = MaterialTheme.typography.bodyMedium)
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.End
-//                ) {
-//                    TextButton(onClick = onEdit) { Text("Изменить") }
-//                    TextButton(onClick = onDelete) { Text("Удалить") }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun RealtorEditScreen(
-//    navController: NavController,
-//    realtorEditViewModel: RealtorEditViewModel = viewModel()
-//) {
-//    val uiState by realtorEditViewModel.uiState.collectAsStateWithLifecycle()
-//
-//    LaunchedEffect(uiState.saveSuccess) {
-//        if (uiState.saveSuccess) {
-//            navController.popBackStack()
-//        }
-//    }
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(title = { Text(if (uiState.isNew) "Новый риелтор" else "Редактирование") })
-//        }
-//    ) { paddingValues ->
-//        Column(modifier = Modifier
-//            .fillMaxSize()
-//            .padding(paddingValues)
-//            .padding(16.dp),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)) {
-//            OutlinedTextField(
-//                value = uiState.fullName,
-//                onValueChange = realtorEditViewModel::onFullNameChange,
-//                label = { Text("ФИО") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            OutlinedTextField(
-//                value = uiState.email,
-//                onValueChange = realtorEditViewModel::onLoginChange,
-//                label = { Text("Логин") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            OutlinedTextField(
-//                value = uiState.email,
-//                onValueChange = realtorEditViewModel::onPasswordChange,
-//                label = { Text("Пароль") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            OutlinedTextField(
-//                value = uiState.phoneNumber,
-//                onValueChange = realtorEditViewModel::onPhoneNumberChange,
-//                label = { Text("Номер телефона") },
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            if (uiState.errorMessage != null) {
-//                Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
-//            }
-//            Button(
-//                onClick = realtorEditViewModel::save,
-//                enabled = !uiState.isSaving,
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                if (uiState.isSaving) CircularProgressIndicator(modifier = Modifier.size(20.dp))
-//                else Text("Сохранить")
-//            }
-//        }
-//    }
-//}
-//
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ClientListScreen(
+    onNavigateToEdit: (Long?) -> Unit,
+    clientViewModel: ClientListViewModel = viewModel()
+) {
+    val uiState by clientViewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            clientViewModel.clearError()
+        }
+    }
+
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Клиенты") }) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { onNavigateToEdit(null) }) {
+                Text("+")
+            }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            when {
+                uiState.isLoading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                uiState.clients.isEmpty() -> {
+                    Text(
+                        text = "Нет ни одного клиента",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.clients, key = { it.id }) { client ->
+                            ClientItem(
+                                client = client,
+                                onEdit = { onNavigateToEdit(client.id) },
+                                onDelete = { clientViewModel.deleteClient(client) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ClientItem(
+    client: ClientEntity,
+    onEdit: () ->Unit,
+    onDelete: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxSize()
+            .padding(4.dp)
+    ) {
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = client.fullName, style = MaterialTheme.typography.bodyMedium)
+                Text(text = client.phoneNumber,style = MaterialTheme.typography.bodyMedium)
+                Text(text = client.email,style = MaterialTheme.typography.bodyMedium)
+                Text(text = client.preference,style = MaterialTheme.typography.bodyMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onEdit) { Text("Изменить") }
+                    TextButton(onClick = onDelete) { Text("Удалить") }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ClientEditScreen(
+    navController: NavController,
+    clientEditViewModel: ClientEditViewModel = viewModel()
+) {
+    val uiState by clientEditViewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(uiState.saveSuccess) {
+        if (uiState.saveSuccess) {
+            navController.popBackStack()
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(if (uiState.isNew) "Новый клиент" else "Редактирование") })
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = uiState.fullName,
+                onValueChange = clientEditViewModel::onFullNameChange,
+                label = { Text("ФИО") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
+            )
+            OutlinedTextField(
+                value = uiState.phoneNumber,
+                onValueChange = clientEditViewModel::onPhoneNumberChange,
+                label = { Text("Номер телефона") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
+            )
+            OutlinedTextField(
+                value = uiState.email,
+                onValueChange = clientEditViewModel::onEmailChange,
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    keyboardType = KeyboardType.Email,
+                    autoCorrectEnabled = false,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
+            )
+            OutlinedTextField(
+                value = uiState.preference,
+                onValueChange = clientEditViewModel::onPreferenceChange,
+                label = { Text("Предпочтения") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
+            )
+            if (uiState.errorMessage != null) {
+                Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
+            }
+            Button(
+                onClick = clientEditViewModel::save,
+                enabled = !uiState.isSaving,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (uiState.isSaving) CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                else Text("Сохранить")
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RealtorListScreen(
+    onNavigateToEdit: (Long?) -> Unit,
+    realtorViewModel: RealtorListViewModel = viewModel()
+) {
+    val uiState by realtorViewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            realtorViewModel.clearError()
+        }
+    }
+
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Риелторы") }) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { onNavigateToEdit(null) }) {
+                Text("+")
+            }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            when {
+                uiState.isLoading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                uiState.realtors.isEmpty() -> {
+                    Text(
+                        text = "Нет ни одного риелтора",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.realtors, key = { it.id }) { realtor ->
+                            RealtorItem(
+                                realtor = realtor,
+                                onEdit = { onNavigateToEdit(realtor.id) },
+                                onDelete = { realtorViewModel.deleteRealtor(realtor) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RealtorItem(
+    realtor: RealtorEntity,
+    onEdit: () ->Unit,
+    onDelete: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxSize()
+            .padding(4.dp)
+    ) {
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = realtor.fullName, style = MaterialTheme.typography.bodyMedium)
+                Text(text = realtor.login,style = MaterialTheme.typography.bodyMedium)
+                Text(text = realtor.password,style = MaterialTheme.typography.bodyMedium)
+                Text(text = realtor.phoneNumber,style = MaterialTheme.typography.bodyMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onEdit) { Text("Изменить") }
+                    TextButton(onClick = onDelete) { Text("Удалить") }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RealtorEditScreen(
+    navController: NavController,
+    realtorEditViewModel: RealtorEditViewModel = viewModel()
+) {
+    val uiState by realtorEditViewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(uiState.saveSuccess) {
+        if (uiState.saveSuccess) {
+            navController.popBackStack()
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(if (uiState.isNew) "Новый риелтор" else "Редактирование") })
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = uiState.fullName,
+                onValueChange = realtorEditViewModel::onFullNameChange,
+                label = { Text("ФИО") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
+            )
+            OutlinedTextField(
+                value = uiState.login,
+                onValueChange = realtorEditViewModel::onLoginChange,
+                label = { Text("Логин") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    keyboardType = KeyboardType.Email,
+                    autoCorrectEnabled = false,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
+            )
+            OutlinedTextField(
+                value = uiState.password,
+                onValueChange = realtorEditViewModel::onPasswordChange,
+                label = { Text("Пароль") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    keyboardType = KeyboardType.Password,
+                    autoCorrectEnabled = false,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
+            )
+            OutlinedTextField(
+                value = uiState.phoneNumber,
+                onValueChange = realtorEditViewModel::onPhoneNumberChange,
+                label = { Text("Номер телефона") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                )
+            )
+            if (uiState.errorMessage != null) {
+                Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
+            }
+            Button(
+                onClick = realtorEditViewModel::save,
+                enabled = !uiState.isSaving,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (uiState.isSaving) CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                else Text("Сохранить")
+            }
+        }
+    }
+}
+
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
 //fun PropertyListScreen(
@@ -782,79 +887,118 @@ fun TypeEditScreen(
 //                value = uiState.ownerId,
 //                onValueChange = propertyEditViewModel::onOwnerIdChange,
 //                label = { Text("Id владельца") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.typeId,
 //                onValueChange = propertyEditViewModel::onTypeIdChange,
 //                label = { Text("Id типа") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.address,
 //                onValueChange = propertyEditViewModel::onAddressChange,
 //                label = { Text("Адрес") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.city,
 //                onValueChange = propertyEditViewModel::onCityChange,
 //                label = { Text("Город") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.district,
 //                onValueChange = propertyEditViewModel::onDistrictChange,
 //                label = { Text("Район") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.area,
 //                onValueChange = propertyEditViewModel::onAreaChange,
 //                label = { Text("Площадь") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.rooms,
 //                onValueChange = propertyEditViewModel::onRoomsChange,
 //                label = { Text("Комнат") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.floor,
 //                onValueChange = propertyEditViewModel::onFloorChange,
 //                label = { Text("Этаж") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.floorsTotal,
 //                onValueChange = propertyEditViewModel::onFloorsTotalChange,
 //                label = { Text("Этажей в доме") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.price,
 //                onValueChange = propertyEditViewModel::onPriceChange,
 //                label = { Text("Цена") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.status,
 //                onValueChange = propertyEditViewModel::onStatusChange,
 //                label = { Text("Статус") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.date,
 //                onValueChange = propertyEditViewModel::onDateChange,
 //                label = { Text("Дата размещения") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.description,
 //                onValueChange = propertyEditViewModel::onDescriptionChange,
 //                label = { Text("Описание") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            if (uiState.errorMessage != null) {
 //                Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
@@ -987,31 +1131,46 @@ fun TypeEditScreen(
 //                value = uiState.propertyId,
 //                onValueChange = viewEditViewModel::onPropertyIdChange,
 //                label = { Text("Id объекта недвижимости") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.clientId,
 //                onValueChange = viewEditViewModel::onClientIdChange,
 //                label = { Text("Id клиента") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.realtorId,
 //                onValueChange = viewEditViewModel::onRealtorIdChange,
 //                label = { Text("Id риелтора") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.date,
 //                onValueChange = viewEditViewModel::onDateChange,
 //                label = { Text("Дата и время") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.result,
 //                onValueChange = viewEditViewModel::onResultChange,
 //                label = { Text("Результат") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            if (uiState.errorMessage != null) {
 //                Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
@@ -1145,37 +1304,55 @@ fun TypeEditScreen(
 //                value = uiState.propertyId,
 //                onValueChange = dealEditViewModel::onPropertyIdChange,
 //                label = { Text("Id объекта недвижимости") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.clientId,
 //                onValueChange = dealEditViewModel::onClientIdChange,
 //                label = { Text("Id клиента") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.realtorId,
 //                onValueChange = dealEditViewModel::onRealtorIdChange,
 //                label = { Text("Id риелтора") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.date,
 //                onValueChange = dealEditViewModel::onDateChange,
 //                label = { Text("Дата и время") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.type,
 //                onValueChange = dealEditViewModel::onTypeChange,
 //                label = { Text("Тип") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            OutlinedTextField(
 //                value = uiState.finalPrice,
 //                onValueChange = dealEditViewModel::onFinalPriceChange,
 //                label = { Text("Окончательная стоимость") },
-//                modifier = Modifier.fillMaxWidth()
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    capitalization = KeyboardCapitalization.Sentences
+//                )
 //            )
 //            if (uiState.errorMessage != null) {
 //                Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)

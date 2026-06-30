@@ -13,10 +13,10 @@ import com.codenly.practice.ui.OwnerListScreen
 import com.codenly.practice.ui.OwnerEditScreen
 import com.codenly.practice.ui.TypeListScreen
 import com.codenly.practice.ui.TypeEditScreen
-//import com.codenly.practice.ui.ClientListScreen
-//import com.codenly.practice.ui.ClientEditScreen
-//import com.codenly.practice.ui.RealtorListScreen
-//import com.codenly.practice.ui.RealtorEditScreen
+import com.codenly.practice.ui.ClientListScreen
+import com.codenly.practice.ui.ClientEditScreen
+import com.codenly.practice.ui.RealtorListScreen
+import com.codenly.practice.ui.RealtorEditScreen
 //import com.codenly.practice.ui.PropertyListScreen
 //import com.codenly.practice.ui.PropertyEditScreen
 //import com.codenly.practice.ui.ViewListScreen
@@ -37,14 +37,15 @@ class MainActivity : ComponentActivity() {
                 composable("home") {
                     HomeScreen(
                         onNavigateToOwners = { navController.navigate("ownerList") },
-                        onNavigateToTypes = { navController.navigate("typeList") }
+                        onNavigateToTypes = { navController.navigate("typeList") },
+                        onNavigateToClients = { navController.navigate("clientList") },
+                        onNavigateToRealtors = { navController.navigate("realtorList") },
                     )
                 }
-//,
-//onNavigateToRealtors = { navController.navigate(realtorList) },
-//onNavigateToProperties = { navController.navigate(propertyList) },
-//onNavigateToViews = { navController.navigate(viewList) },
-//onNavigateToDeals = { navController.navigate(dealList) }
+
+//onNavigateToProperties = { navController.navigate("propertyList") },
+//onNavigateToViews = { navController.navigate("viewList") },
+//onNavigateToDeals = { navController.navigate("dealList") }
                 composable("ownerList") {
                     OwnerListScreen(
                         onNavigateToEdit = { ownerId ->
@@ -79,40 +80,40 @@ class MainActivity : ComponentActivity() {
                     TypeEditScreen(navController = navController)
                 }
 
-//                composable("clientList") {
-//                    ClientListScreen(
-//                        onNavigateToEdit = { clientId ->
-//                            val route = if (clientId == null) "clientEdit/new" else "clientEdit/$clientId"
-//                            navController.navigate(route)
-//                        }
-//                    )
-//                }
-//
-//                composable (
-//                    route = "clientEdit/{clientId}",
-//                    arguments = listOf(navArgument("clientId") { type = NavType.StringType })
-//                ){  backStackEntry ->
-//                    val clientId = backStackEntry.arguments?.getString("clientId") ?: "new"
-//                    ClientEditScreen(navController = navController)
-//                }
-//
-//                composable("realtorList") {
-//                    RealtorListScreen(
-//                        onNavigateToEdit = { realtorId ->
-//                            val route = if (realtorId == null) "realtorEdit/new" else "realtorEdit/$realtorId"
-//                            navController.navigate(route)
-//                        }
-//                    )
-//                }
-//
-//                composable (
-//                    route = "realtorEdit/{realtorId}",
-//                    arguments = listOf(navArgument("realtorId") { type = NavType.StringType })
-//                ){  backStackEntry ->
-//                    val realtorId = backStackEntry.arguments?.getString("realtorId") ?: "new"
-//                    RealtorEditScreen(navController = navController)
-//                }
-//
+                composable("clientList") {
+                    ClientListScreen(
+                        onNavigateToEdit = { clientId ->
+                            val route = if (clientId == null) "clientEdit/new" else "clientEdit/$clientId"
+                            navController.navigate(route)
+                        }
+                    )
+                }
+
+                composable (
+                    route = "clientEdit/{clientId}",
+                    arguments = listOf(navArgument("clientId") { type = NavType.StringType })
+                ){  backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: "new"
+                    ClientEditScreen(navController = navController)
+                }
+
+                composable("realtorList") {
+                    RealtorListScreen(
+                        onNavigateToEdit = { realtorId ->
+                            val route = if (realtorId == null) "realtorEdit/new" else "realtorEdit/$realtorId"
+                            navController.navigate(route)
+                        }
+                    )
+                }
+
+                composable (
+                    route = "realtorEdit/{realtorId}",
+                    arguments = listOf(navArgument("realtorId") { type = NavType.StringType })
+                ){  backStackEntry ->
+                    val realtorId = backStackEntry.arguments?.getString("realtorId") ?: "new"
+                    RealtorEditScreen(navController = navController)
+                }
+
 //                composable("propertyList") {
 //                    PropertyListScreen(
 //                        onNavigateToEdit = { propertyId ->
